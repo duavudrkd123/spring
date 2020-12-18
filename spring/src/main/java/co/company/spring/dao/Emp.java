@@ -14,4 +14,5 @@ public class Emp {
 	String jobId;	
 	String departmentId;
 	Integer salary;
+	String msg;
 }

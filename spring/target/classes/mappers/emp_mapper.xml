@@ -2,65 +2,139 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.company.app.emp.service.impl.EmpMapper">
+<mapper namespace="co.company.spring.dao.EmpMapper">
 
-<!-- 단건조회  -->
+	<!-- 단건조회 -->
 	<select id="getEmp" parameterType="emp" resultType="emp">
-		SELECT  
-		        first_name,
-				last_name,
-				email,
-				hire_date,
-				job_id
+		SELECT
+		first_name,
+		last_name,
+		email,
+		hire_date,
+		job_id
 		FROM employees
-		WHERE employee_id = #{employeeId}
-	</select>
-	
-<!-- 전체조회  -->	
-	<select id="getEmpList" resultType="emp">
-		SELECT rownum id, e.* 
-		  FROM employees e
-		<where>  
-		  <if test="departmentId != null">
-		       department_id = #{departmentId}
-		  </if>  
-	      <if test="employeeId != null">
-            and employee_id = #{employeeId}
-          </if>  
-          <if test="salary != null">
-            <![CDATA[ and salary < #{salary} ]]>
-          </if>    
-          <if test="firstName != null">
-            and upper(first_name) like '%' || upper(#{firstName}) || '%'
-          </if> 
-          <if test="employeeIds != null">
-            and employee_id in  
-                <foreach collection="employeeIds" item="id" 
-                         open="(" close=")" separator=",">
-                    #{id}
-                </foreach>
-          </if>      
-        </where>	
-		 ORDER BY first_name 
+		WHERE
+		employee_id = #{employeeId}
 	</select>
 
-<!--  사원등록    -->
-	<insert id="insertEmp" parameterType="emp">
-		INSERT INTO EMPLOYEES (	employee_id, 
-								first_name, 
-								last_name,
-								email,
-								hire_date,
-								job_id
-								)
-	 	                VALUES(
-	 	               			#{employeeId},
-	 	               			#{firstName},
-	 	               			#{lastName},
-	 	               			#{email},
-	 	               			#{hireDate},
-	 	               			#{jobId})
+	<!-- 전체 레코드 건수 조회 -->
+	<select id="getCount" resultType="int">
+		SELECT COUNT(*) FROM EMPLOYEES
+		<where>
+			<if test="firstName != null and firstName != ''">
+				upper(FIRST_NAME) like '%' || upper(#{firstName}) || '%'
+			</if>
+			<if test="departmentId != null and departmentId !=''">
+				AND DEPARTMENT_ID = #{departmentId}
+			</if>
+			<!-- <if test="minSalary != null and minSalary != ''"> -->
+			<!-- <![CDATA[AND SALARY >= #{minSalary}]]> -->
+			<!-- </if> -->
+			<!-- <if test="maxSalary != null and maxSalary != ''"> -->
+			<!-- <![CDATA[AND SALARY <= #{maxSalary}]]> -->
+			<!-- </if> -->
+			<if test="minSalary != null and maxSalary != null">
+				AND SALARY between #{minSalary} and #{maxSalary}
+			</if>
+		</where>
+	</select>
+	<!-- 부서별 사원수 부서명 사원수 -->
+	<select id="getStatDept" resultType="map">
+		SELECT
+		A.DEPARTMENT_ID 	"deptId",
+		B.DEPARTMENT_NAME 	"deptName",
+		COUNT(*)	 		"cnt"
+		FROM EMPLOYEES A, DEPARTMENTS B
+		WHERE
+		A.DEPARTMENT_ID = B.DEPARTMENT_ID
+		group by A.DEPARTMENT_ID,
+		B.DEPARTMENT_NAME
+	</select>
+
+	<!-- 전체조회 -->
+	<select id="getEmpList" resultType="emp" parameterType="emp"> <!-- 파라미터는 생략가능 -->
+		SELECT *
+		FROM EMPLOYEES
+		<where>
+			<if test="firstName != null and firstName != ''">
+				upper(FIRST_NAME) like '%' || upper(#{firstName}) || '%'
+			</if>
+			<if test="departmentId != null and departmentId !=''">
+				AND DEPARTMENT_ID = #{departmentId}
+			</if>
+			<!-- <if test="minSalary != null and minSalary != ''"> -->
+			<!-- <![CDATA[AND SALARY >= #{minSalary}]]> -->
+			<!-- </if> -->
+			<!-- <if test="maxSalary != null and maxSalary != ''"> -->
+			<!-- <![CDATA[AND SALARY <= #{maxSalary}]]> -->
+			<!-- </if> -->
+			<if test="minSalary != null and maxSalary != null">
+				AND SALARY between #{minSalary} and #{maxSalary}
+			</if>
+		</where>
+	</select>
+
+	<!-- 업데이트 -->
+	<update id="updateEmp">
+		update Employees
+		<set>
+			<if test="firstName != null">FIRST_NAME=#{firstName},</if>
+			<if test="email != null">EMAIL=#{email}</if>
+		</set>
+		where employee_id=#{employeeId}
+	</update>
+	<!-- 프로시저를 이용한 사원등록 -->
+	<insert id="insertEmpProc" statementType="CALLABLE">
+		{call INS_EMP(
+		#{lastName},
+		#{email},
+		#{jobId},
+		#{msg, mode=OUT, jdbcType=VARCHAR,
+		javaType=string},
+		#{employeeId, mode=OUT,jdbcType=VARCHAR,
+		javaType=string}
+
+
+		)}
 	</insert>
-	
+	<!-- 사원등록 -->
+	<insert id="insertEmp" parameterType="emp">
+		<selectKey order="BEFORE" keyProperty="employeeId"
+			resultType="string">
+			SELECT MAX(EMPLOYEE_ID)+1
+			FROM EMPLOYEES
+		</selectKey>
+		INSERT INTO EMPLOYEES (
+		employee_id,
+		first_name,
+		last_name,
+		email,
+		hire_date,
+		job_id
+		)
+		VALUES(
+		#{employeeId},
+		#{firstName},
+		#{lastName},
+		#{email},
+		#{hireDate},
+		#{jobId})
+	</insert>
+	<!-- 단건삭제 -->
+	<delete id="deleteEmp">
+		DELETE EMPLOYEES
+		WHERE EMPLOYEE_ID = #{employeeId}
+	</delete>
+
+	<!-- 선택 다건 삭제 -->
+	<delete id="deleteMutiEmp">
+		DELETE EMPLOYEES
+		WHERE EMPLOYEE_ID IN
+		<foreach collection="list" item="id" open="(" close=")"
+			separator=",">
+			#{id}
+		</foreach>
+
+	</delete>
 
 </mapper>

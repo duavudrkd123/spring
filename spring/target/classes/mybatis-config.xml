@@ -8,8 +8,7 @@
 		<setting name="mapUnderscoreToCamelCase" value="true" />
 	</settings>
 	<typeAliases>
-		<typeAlias type="com.company.app.emp.service.Emp" alias="emp"/> 
-		<typeAlias type="com.company.app.emp.service.Dept" alias="dept"/>
-		<package name="com.company.app.emp.service"/>
+		<typeAlias type="co.company.spring.dao.Emp" alias="emp"/> 
+		<package name="co.company.spring.dao"/>
 	</typeAliases>
 </configuration>  

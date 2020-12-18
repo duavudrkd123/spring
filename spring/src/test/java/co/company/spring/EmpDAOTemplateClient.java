@@ -17,7 +17,7 @@ public class EmpDAOTemplateClient {
 	@Autowired EmpDAOJdbcTemplate empDao;
 	@Test
 	public void empdaotest() {
-		System.out.println("꺄약"+empDao.getListMap());
+		System.out.println("꺄약"+empDao.getList());
 	}
 	@Test
 	public void inserttest() {
