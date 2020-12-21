@@ -7,6 +7,10 @@
 	<!-- 단건조회 -->
 	<select id="getEmp" parameterType="emp" resultType="emp">
 		SELECT
+		employee_id,
+		department_id,
+		salary,
+		
 		first_name,
 		last_name,
 		email,
@@ -41,13 +45,16 @@
 	<!-- 부서별 사원수 부서명 사원수 -->
 	<select id="getStatDept" resultType="map">
 		SELECT
-		A.DEPARTMENT_ID 	"deptId",
-		B.DEPARTMENT_NAME 	"deptName",
-		COUNT(*)	 		"cnt"
-		FROM EMPLOYEES A, DEPARTMENTS B
+		A.DEPARTMENT_ID
+		"deptId",
+		B.DEPARTMENT_NAME "deptName",
+		COUNT(*) "cnt"
+		FROM EMPLOYEES A,
+		DEPARTMENTS B
 		WHERE
 		A.DEPARTMENT_ID = B.DEPARTMENT_ID
-		group by A.DEPARTMENT_ID,
+		group by
+		A.DEPARTMENT_ID,
 		B.DEPARTMENT_NAME
 	</select>
 
@@ -136,5 +143,15 @@
 		</foreach>
 
 	</delete>
+	<!-- job id값을 표현할 select를 만들어주고 -->
+	<select id="jobSelect" resultType="co.company.spring.dao.Jobs">
+		SELECT JOB_ID, JOB_TITLE
+		FROM JOBS
+		ORDER BY JOB_ID
 
+	</select>
+	<!-- departmentId select option을 만들어준다 -->
+	<select id="departmentSelect" resultType="co.company.spring.dao.Departments">
+	SELECT DEPARTMENT_ID, DEPARTMENT_NAME FROM DEPARTMENTS ORDER BY DEPARTMENT_ID
+	</select>
 </mapper>

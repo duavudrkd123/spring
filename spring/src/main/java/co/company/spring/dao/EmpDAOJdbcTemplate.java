@@ -10,7 +10,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
-@Component
+//@Component
 public class EmpDAOJdbcTemplate {
 	final String SELECT = "SELECT * FROM EMPLOYEES";
 	final String INSERT = "INSERT INTO EMPLOYEES(EMPLOYEE_ID, LAST_NAME, EMAIL, "

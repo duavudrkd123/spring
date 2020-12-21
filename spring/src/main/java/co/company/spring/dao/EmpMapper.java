@@ -15,4 +15,7 @@ public interface EmpMapper {
 	public int deleteEmp(Emp emp);
 	public int deleteMutiEmp(EmpSearch emp);
 	public List<Map<String, Object>> getStatDept();
+	public List<Departments> departmentSelect();
+	
+	public List<Jobs> jobSelect();
 }
